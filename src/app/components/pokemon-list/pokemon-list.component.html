@@ -1,0 +1,85 @@
+<div class="pokedex">
+  <header class="pokedex__header">
+    <h1 class="pokedex__title">Pokédex</h1>
+    <p class="pokedex__subtitle">Consumo de PokéAPI con Angular + RxJS</p>
+  </header>
+
+  <!-- Estado de carga -->
+  <div class="state state--loading" *ngIf="loading">
+    <div class="pokeball-spinner" aria-hidden="true"></div>
+    <p>Cargando Pokémon...</p>
+  </div>
+
+  <!-- Estado de error -->
+  <div class="state state--error" *ngIf="!loading && errorMessage">
+    <p>⚠️ {{ errorMessage }}</p>
+    <button class="btn btn--retry" (click)="loadPage()">Reintentar</button>
+  </div>
+
+  <!-- Listado -->
+  <div class="grid" *ngIf="!loading && !errorMessage">
+    <article
+      class="card"
+      *ngFor="let pokemon of pokemons; trackBy: trackByPokemonId"
+      [ngClass]="'type-' + pokemon.types[0]"
+    >
+      <span class="card__id">#{{ pokemon.id.toString().padStart(3, '0') }}</span>
+
+      <img
+        class="card__image"
+        [src]="pokemon.imageUrl"
+        [alt]="pokemon.name"
+        loading="lazy"
+      />
+
+      <h2 class="card__name">{{ pokemon.name }}</h2>
+
+      <div class="card__types">
+        <span
+          class="badge"
+          *ngFor="let type of pokemon.types"
+          [ngClass]="'type-' + type"
+          >{{ type }}</span
+        >
+      </div>
+
+      <dl class="card__stats">
+        <div class="card__stat">
+          <dt>Altura</dt>
+          <dd>{{ pokemon.height / 10 }} m</dd>
+        </div>
+        <div class="card__stat">
+          <dt>Peso</dt>
+          <dd>{{ pokemon.weight / 10 }} kg</dd>
+        </div>
+        <div class="card__stat">
+          <dt>Exp. base</dt>
+          <dd>{{ pokemon.baseExperience }}</dd>
+        </div>
+        <div class="card__stat card__stat--wide">
+          <dt>Habilidades</dt>
+          <dd>{{ pokemon.abilities.join(', ') }}</dd>
+        </div>
+      </dl>
+    </article>
+  </div>
+
+  <!-- Paginación -->
+  <footer class="pagination" *ngIf="!loading && !errorMessage && pokemons.length">
+    <button
+      class="btn"
+      (click)="previousPage()"
+      [disabled]="!hasPreviousPage"
+    >
+      ← Anterior
+    </button>
+
+    <span class="pagination__info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </span>
+
+    <button class="btn" (click)="nextPage()" [disabled]="!hasNextPage">
+      Siguiente →
+    </button>
+  </footer>
+</div>
